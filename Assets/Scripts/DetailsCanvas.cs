@@ -1,12 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using TMPro;
 using UnityEngine.UI;
 using System.Text;
-using Newtonsoft.Json;
 using System;
+using Newtonsoft.Json;
+
 
 public class DetailsCanvas : MonoBehaviour
 {
@@ -26,6 +26,10 @@ public class DetailsCanvas : MonoBehaviour
     [Space]
     [SerializeField] private ToogleSwitchButton toogleSwitchButton;
 
+    [Space]
+    [SerializeField] private GameObject colorPicker;
+    private bool pickerStatus;
+
     private bool scroolBarStatus;
 
     private const string serverURI = "https://pusbkbbia3.execute-api.us-east-1.amazonaws.com/default/get_cat";
@@ -33,6 +37,14 @@ public class DetailsCanvas : MonoBehaviour
     private void Awake()
     {
         inputFieldTextLength = descriptionInputField.gameObject.GetComponent<RectTransform>().rect.height;
+    }
+    void OnEnable()
+    {
+        FlexibleColorPicker.colorChange += ColorImageChange;
+    }
+    void OnDisable()
+    {
+        FlexibleColorPicker.colorChange -= ColorImageChange;
     }
     public void OnGetCatButtonClicked()
     {
@@ -84,21 +96,15 @@ public class DetailsCanvas : MonoBehaviour
     }
     private void UIUpdate(CatDetailsResponse catDetailsResponse)
     {
-        Color newColor;
-
         nameText.text = catDetailsResponse.name;
 
         InputFieldHandler(catDetailsResponse.description);
 
         QRCodeImageHandler(catDetailsResponse.qr_code);
 
-        if (ColorUtility.TryParseHtmlString($"#{catDetailsResponse.color}", out newColor))
-        {
-            colorImage.color = newColor;
-        }
+        ColorImageChange($"#{catDetailsResponse.color}");
 
         toogleSwitchButton.OnButtonToogle(catDetailsResponse.enable);
-
     }
     private void InputFieldHandler(string receivedDescription)
     {
@@ -116,5 +122,29 @@ public class DetailsCanvas : MonoBehaviour
         Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100);
         qrCode.sprite = sprite;
         qrCode.color = Color.white;
+    }
+    private void ColorImageChange(string colorText)
+    {
+        Color newColor;
+
+        if (ColorUtility.TryParseHtmlString(colorText, out newColor))
+        {
+            colorImage.color = newColor;
+        }
+    }
+
+    public void ColorPickerStatusButton()
+    { 
+        if(pickerStatus==false)
+        {
+            colorPicker.SetActive(true);
+            colorPicker.GetComponent<FlexibleColorPicker>().startingColor = colorImage.color;
+            pickerStatus = true;
+        }
+        else
+        {
+            colorPicker.SetActive(false);
+            pickerStatus = false;
+        }
     }
 }
