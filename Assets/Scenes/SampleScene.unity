@@ -1567,6 +1567,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nameText: {fileID: 889017631}
   descriptionInputField: {fileID: 2057582249}
+  scroolBar: {fileID: 1911886363}
   qrCode: {fileID: 216910329}
   colorImage: {fileID: 172432220}
   toogleSwitchButton: {fileID: 917147969}

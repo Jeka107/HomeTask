@@ -11,13 +11,29 @@ using System;
 public class DetailsCanvas : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI nameText;
+
+    [Header("Input Field")]
     [SerializeField] private TMP_InputField descriptionInputField;
+    [SerializeField] private GameObject scroolBar;
+    private float inputFieldTextLength;
+
+    [Space]
     [SerializeField] private Image qrCode;
+
+    [Space]
     [SerializeField] private Image colorImage;
+
+    [Space]
     [SerializeField] private ToogleSwitchButton toogleSwitchButton;
+
+    private bool scroolBarStatus;
 
     private const string serverURI = "https://pusbkbbia3.execute-api.us-east-1.amazonaws.com/default/get_cat";
 
+    private void Awake()
+    {
+        inputFieldTextLength = descriptionInputField.gameObject.GetComponent<RectTransform>().rect.height;
+    }
     public void OnGetCatButtonClicked()
     {
         StartCoroutine(GetDetailsHandler());
@@ -71,7 +87,8 @@ public class DetailsCanvas : MonoBehaviour
         Color newColor;
 
         nameText.text = catDetailsResponse.name;
-        descriptionInputField.text = catDetailsResponse.description;
+
+        InputFieldHandler(catDetailsResponse.description);
 
         QRCodeImageHandler(catDetailsResponse.qr_code);
 
@@ -83,7 +100,14 @@ public class DetailsCanvas : MonoBehaviour
         toogleSwitchButton.OnButtonToogle(catDetailsResponse.enable);
 
     }
-
+    private void InputFieldHandler(string receivedDescription)
+    {
+        scroolBar.GetComponent<Scrollbar>().value = 0;
+        
+        descriptionInputField.text = receivedDescription;
+        scroolBarStatus = descriptionInputField.text.Length > inputFieldTextLength ? true : false;
+        scroolBar.SetActive(scroolBarStatus);
+    }
     private void QRCodeImageHandler(string receivedQRCode)
     {
         byte[] imageBytes = Convert.FromBase64String(receivedQRCode);
