@@ -14,7 +14,9 @@ public class DetailsCanvas : MonoBehaviour
 
     [Header("Input Field")]
     [SerializeField] private TMP_InputField descriptionInputField;
+    [SerializeField] private RectTransform inputFieldText;
     [SerializeField] private GameObject scroolBar;
+    [SerializeField] private float inputFieldTextHieght;
     private float inputFieldTextLength;
 
     [Space]
@@ -111,7 +113,14 @@ public class DetailsCanvas : MonoBehaviour
         scroolBar.GetComponent<Scrollbar>().value = 0;
         
         descriptionInputField.text = receivedDescription;
-        scroolBarStatus = descriptionInputField.text.Length > inputFieldTextLength ? true : false;
+        ScrollbarStatus();
+    }
+    public void ScrollbarStatus()
+    {
+        //check if text not fit in text area;
+        scroolBarStatus = (descriptionInputField.text.Length > inputFieldTextLength)|| 
+            (scroolBarStatus = inputFieldText.offsetMax.y > inputFieldTextHieght) ? true : false;
+        
         scroolBar.SetActive(scroolBarStatus);
     }
     private void QRCodeImageHandler(string receivedQRCode)
